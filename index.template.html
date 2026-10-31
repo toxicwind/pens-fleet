@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pens Fleet — repo catalog</title>
+<style>
+:root{color-scheme:dark}
+body{background:#0d1117;color:#e6edf3;font:15px/1.45 ui-sans-serif,system-ui,sans-serif;margin:0;padding:2rem}
+h1{font-size:1.4rem;margin:0 0 .25rem} .sub{color:#8b949e;margin:0 0 1rem}
+input{width:100%;box-sizing:border-box;padding:.6rem .8rem;background:#161b22;border:1px solid #30363d;border-radius:8px;color:inherit;font-size:1rem;margin-bottom:.75rem}
+#count{color:#8b949e;font-size:.85rem;margin-bottom:.5rem}
+table{width:100%;border-collapse:collapse}
+td,th{padding:.45rem .6rem;border-bottom:1px solid #21262d;text-align:left;vertical-align:top}
+th{color:#8b949e;font-weight:600;position:sticky;top:0;background:#0d1117}
+td.n a{color:#58a6ff;text-decoration:none;font-weight:600} td.n a:hover{text-decoration:underline}
+td.d{color:#8b949e;max-width:36rem} tr.archived{opacity:.45}
+tag{font-size:.75rem;background:#1f6feb33;color:#58a6ff;border-radius:8px;padding:.1rem .5rem}
+@media(max-width:720px){td.d{display:none} body{padding:1rem}}
+</style></head><body>
+<h1> Pens Fleet</h1>
+<p class="sub">Every owned repo in the pens estate · generated from GitHub metadata · search with `/`</p>
+<input id="q" placeholder="filter by name, description, language…" autofocus>
+<div id="count"></div>
+<table><thead><tr><th>repo</th><th>description</th><th>lang</th><th>pushed</th><th>★</th></tr></thead>
+<tbody id="t"></tbody></table>
+<script>
+const DATA = __DATA__;
+const t = document.getElementById('t'), q = document.getElementById('q'), c = document.getElementById('count');
+function esc(s){return s.replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function render(){
+  const term = q.value.toLowerCase().trim();
+  const parts = term.split(/\s+/);
+  const rows = DATA.filter(r=>{
+    const hay = (r.n+' '+r.d+' '+r.l).toLowerCase();
+    return parts.every(p=>hay.includes(p));
+  });
+  c.textContent = rows.length+' of '+DATA.length+' repos';
+  t.innerHTML = rows.map(r=>`<tr${r.a?' class="archived"':''}><td class="n"><a href="${r.url}">${esc(r.n)}</a>${r.a?' <tag>archived</tag>':''}</td><td class="d">${r.d||''}</td><td>${esc(r.l)}</td><td>${r.u}</td><td>${r.s||''}</td></tr>`).join('');
+}
+q.addEventListener('input',render);
+document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement!==q){e.preventDefault();q.focus()}});
+render();
+</script></body></html>
